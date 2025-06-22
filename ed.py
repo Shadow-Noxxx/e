@@ -135,13 +135,14 @@ async def on_edited_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"""🚨 *Message Edit Detected\!*
+            text=(
+    f"🚨 *Message Edit Detected\\!*\n\n"
+    f"👤 [_{safe_name}_](tg://user?id={user_id}) tried to *edit* their message\\.\n"
+    f"🗑️ So I deleted it\\.\n\n"
+    f"🔐 Only *authorized users* can edit messages here\\.\n"
+    f"Use `/auth {user_id}` if it was a mistake\\."
+),
 
-👤 [_{safe_name}_](tg://user?id={user_id}) tried to *edit* their message\.
-🗑️ So I deleted it\.
-
-🔐 Only *authorized users* can edit messages here\.
-Use `/auth {user_id}` if it was a mistake\.""",
             parse_mode="MarkdownV2"
         )
     except Exception as e:
