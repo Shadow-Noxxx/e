@@ -23,14 +23,13 @@ authorized_users_per_chat = {}
 # Inline buttons for /start
 def get_main_buttons():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🌐 Support", url="https://t.me/YourSupportGroup")],
-        [InlineKeyboardButton("📄 Docs", url="https://example.com/docs")],
-        [InlineKeyboardButton("🤖 Bot Channel", url="https://t.me/YourBotChannel")]
+        [InlineKeyboardButton("🌐 Support", url="https://t.me/fos_bots")],
+                [InlineKeyboardButton("🤖 Bot Channel", url="https://t.me/fos_bots")]
     ])
 
 # Utility to get target user
 def get_target_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.reply_to_message:
+    if update.message and update.message.reply_to_message:
         return update.message.reply_to_message.from_user.id
     elif context.args:
         try:
@@ -55,6 +54,9 @@ Admins can manage permissions using:
 
 # /auth
 async def auth(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
     chat_id = update.effective_chat.id
     user_id = update.effective_user.id
     member = await update.effective_chat.get_member(user_id)
@@ -75,6 +77,9 @@ async def auth(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # /unauth
 async def unauth(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
     chat_id = update.effective_chat.id
     user_id = update.effective_user.id
     member = await update.effective_chat.get_member(user_id)
@@ -95,6 +100,9 @@ async def unauth(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # /authlist
 async def authlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
     chat_id = update.effective_chat.id
     user_ids = authorized_users_per_chat.get(chat_id, set())
 
@@ -136,13 +144,12 @@ async def on_edited_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=chat_id,
             text=(
-    f"🚨 *Message Edit Detected\\!*\n\n"
-    f"👤 [_{safe_name}_](tg://user?id={user_id}) tried to *edit* their message\\.\n"
-    f"🗑️ So I deleted it\\.\n\n"
-    f"🔐 Only *authorized users* can edit messages here\\.\n"
-    f"Use `/auth {user_id}` if it was a mistake\\."
-),
-
+                f"🚨 *Message Edit Detected\!*\n\n"
+                f"👤 [_{safe_name}_](tg://user?id={user_id}) tried to *edit* their message\.\n"
+                f"🗑️ So I deleted it\.\n\n"
+                f"🔐 Only *authorized users* can edit messages here\.\n"
+                f"Use `/auth {user_id}` if it was a mistake\."
+            ),
             parse_mode="MarkdownV2"
         )
     except Exception as e:
