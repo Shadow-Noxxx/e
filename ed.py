@@ -41,11 +41,11 @@ def get_target_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "👋 *Welcome to EditGuard Bot\!*\n\n"
+        r"""👋 *Welcome to EditGuard Bot\!*\n\n"
         "🔒 This bot deletes edited messages from unauthorized users\.\n"
         "Admins can manage permissions using:\n"
-        "`/auth`, `/unauth`, `/authlist`\n\n"
-        "💡 *Tip:* Reply to a user’s message and use `/auth` or `/unauth`\n",
+        "/auth, /unauth, /authlist\n\n"
+        "💡 *Tip:* Reply to a user’s message and use /auth or /unauth""",
         parse_mode="MarkdownV2",
         reply_markup=get_main_buttons()
     )
@@ -97,17 +97,17 @@ async def authlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not user_ids:
         await update.message.reply_text(
-            "📋 *No users are currently authorized in this group\.*",
+            r"📋 *No users are currently authorized in this group\.*",
             parse_mode="MarkdownV2"
         )
         return
 
-    lines = ["\ud83d\udcc4 *Authorized Users:*"]
+    lines = ["📄 *Authorized Users:*"]
     for uid in user_ids:
         try:
             member = await update.effective_chat.get_member(uid)
             safe_name = escape_markdown(member.user.full_name, version=2)
-            lines.append(f"\ud83d\udc64 [{safe_name}](tg://user?id={uid})")
+            lines.append(f"👤 [{safe_name}](tg://user?id={uid})")
         except:
             lines.append(f"❔ Unknown User (`{uid}`)")
 
@@ -132,13 +132,10 @@ async def on_edited_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=(
-                f"🚨 *Message Edit Detected\!*\n\n"
-                f"👤 [_{safe_name}_](tg://user?id={user_id}) tried to *edit* their message\.\n"
-                f"🗑\ufe0f So I deleted it\.\n\n"
-                f"🔐 Only *authorized users* can edit messages here\.
-Use `/auth {user_id}` if it was a mistake\.")
-            ,
+            text=f"""🚨 *Message Edit Detected\!*\n\n
+👤 [_{safe_name}_](tg://user?id={user_id}) tried to *edit* their message\.\n
+🗑️ So I deleted it\.\n\n
+🔐 Only *authorized users* can edit messages here\.\nUse `/auth {user_id}` if it was a mistake\.""",
             parse_mode="MarkdownV2"
         )
     except Exception as e:
